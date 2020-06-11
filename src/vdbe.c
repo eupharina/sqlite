@@ -730,6 +730,7 @@ int sqlite3VdbeExec(
   u64 nProgressLimit;        /* Invoke xProgress() when nVmStep reaches this */
 #endif
   Mem *aMem = p->aMem;       /* Copy of p->aMem */
+  assert( EIGHT_BYTE_ALIGNMENT(aMem) );
   Mem *pIn1 = 0;             /* 1st input operand */
   Mem *pIn2 = 0;             /* 2nd input operand */
   Mem *pIn3 = 0;             /* 3rd input operand */
@@ -1180,6 +1181,7 @@ case OP_Halt: {
     }
     aOp = p->aOp;
     aMem = p->aMem;
+    assert( EIGHT_BYTE_ALIGNMENT(aMem) );
     pOp = &aOp[pcx];
     break;
   }
@@ -4748,6 +4750,7 @@ case OP_SeekGT: {       /* jump, in3, group, ncycle */
     assert( oc!=OP_SeekLT || r.default_rc==+1 );
 
     r.aMem = &aMem[pOp->p3];
+    assert( EIGHT_BYTE_ALIGNMENT(r.aMem) );
 #ifdef SQLITE_DEBUG
     {
       int i;
@@ -5176,6 +5179,7 @@ case OP_Found: {        /* jump, in3, ncycle */
   pC->seekOp = pOp->opcode;
 #endif
   r.aMem = &aMem[pOp->p3];
+  assert( EIGHT_BYTE_ALIGNMENT(r.aMem) );
   assert( pC->eCurType==CURTYPE_BTREE );
   assert( pC->uc.pCursor!=0 );
   assert( pC->isTable==0 );
@@ -6338,6 +6342,7 @@ case OP_IdxInsert: {        /* in2 */
   x.nKey = pIn2->n;
   x.pKey = pIn2->z;
   x.aMem = aMem + pOp->p3;
+  assert( EIGHT_BYTE_ALIGNMENT(x.aMem) );
   x.nMem = (u16)pOp->p4.i;
   rc = sqlite3BtreeInsert(pC->uc.pCursor, &x,
        (pOp->p5 & (OPFLAG_APPEND|OPFLAG_SAVEPOSITION|OPFLAG_PREFORMAT)), 
@@ -6408,6 +6413,7 @@ case OP_IdxDelete: {
   r.nField = (u16)pOp->p3;
   r.default_rc = 0;
   r.aMem = &aMem[pOp->p2];
+  assert( EIGHT_BYTE_ALIGNMENT(r.aMem) );
   rc = sqlite3BtreeIndexMoveto(pCrsr, &r, &res);
   if( rc ) goto abort_due_to_error;
   if( res==0 ){
@@ -6596,6 +6602,8 @@ case OP_IdxGE:  {       /* jump, ncycle */
     r.default_rc = 0;
   }
   r.aMem = &aMem[pOp->p3];
+  assert( EIGHT_BYTE_ALIGNMENT(r.aMem) );
+
 #ifdef SQLITE_DEBUG
   {
     int i;
@@ -7189,6 +7197,8 @@ case OP_Program: {        /* jump */
     pFrame->nChildCsr = pProgram->nCsr;
     pFrame->pc = (int)(pOp - aOp);
     pFrame->aMem = p->aMem;
+    assert( EIGHT_BYTE_ALIGNMENT(pFrame->aMem) );
+
     pFrame->nMem = p->nMem;
     pFrame->apCsr = p->apCsr;
     pFrame->nCursor = p->nCursor;
@@ -7200,6 +7210,7 @@ case OP_Program: {        /* jump */
 #endif
 
     pEnd = &VdbeFrameMem(pFrame)[pFrame->nChildMem];
+    assert( EIGHT_BYTE_ALIGNMENT(aMem) );
     for(pMem=VdbeFrameMem(pFrame); pMem!=pEnd; pMem++){
       pMem->flags = MEM_Undefined;
       pMem->db = db;
@@ -7224,6 +7235,7 @@ case OP_Program: {        /* jump */
   p->nChange = 0;
   p->pFrame = pFrame;
   p->aMem = aMem = VdbeFrameMem(pFrame);
+  assert( EIGHT_BYTE_ALIGNMENT(aMem) );
   p->nMem = pFrame->nChildMem;
   p->nCursor = (u16)pFrame->nChildCsr;
   p->apCsr = (VdbeCursor **)&aMem[p->nMem];
