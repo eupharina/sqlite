@@ -304,7 +304,7 @@ void sqlite3NestedParse(Parse *pParse, const char *zFormat, ...){
   char *zSql;
   sqlite3 *db = pParse->db;
   u32 savedDbFlags = db->mDbFlags;
-  char saveBuf[PARSE_TAIL_SZ];
+  Parse saveParse;
 
   if( pParse->nErr ) return;
   if( pParse->eParseMode ) return;
@@ -321,13 +321,13 @@ void sqlite3NestedParse(Parse *pParse, const char *zFormat, ...){
     return;
   }
   pParse->nested++;
-  memcpy(saveBuf, PARSE_TAIL(pParse), PARSE_TAIL_SZ);
+  memcpy(PARSE_TAIL(&saveParse), PARSE_TAIL(pParse), PARSE_TAIL_SZ);
   memset(PARSE_TAIL(pParse), 0, PARSE_TAIL_SZ);
   db->mDbFlags |= DBFLAG_PreferBuiltin;
   sqlite3RunParser(pParse, zSql);
   db->mDbFlags = savedDbFlags;
   sqlite3DbFree(db, zSql);
-  memcpy(PARSE_TAIL(pParse), saveBuf, PARSE_TAIL_SZ);
+  memcpy(PARSE_TAIL(pParse), PARSE_TAIL(&saveParse), PARSE_TAIL_SZ);
   pParse->nested--;
 }
 
