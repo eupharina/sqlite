@@ -1004,17 +1004,17 @@ typedef INT16_TYPE LogEst;
 ** Except, if SQLITE_4_BYTE_ALIGNED_MALLOC is defined, then the
 ** underlying malloc() implementation might return us 4-byte aligned
 ** pointers.  In that case, only verify 4-byte alignment.
+**
+** For CHERI support we want 16-byte alignment. We also do this for native to
+** make debugging easier. The macro name is a lie anyway so I don't see why we
+** should't lie just a little bit more.
 */
 #ifdef SQLITE_4_BYTE_ALIGNED_MALLOC
-# define EIGHT_BYTE_ALIGNMENT(X)   ((((uptr)(X) - (uptr)0)&3)==0)
+# define SQLITE_MALLOC_ALIGNMENT 4
 #else
-/*
- * For CHERI support we want 16-byte alignment. We also do this for native to
- * make debugging easier. The macro name is a lie anyway so I don't see why we
- * should't lie just a little bit more.
- */
-# define EIGHT_BYTE_ALIGNMENT(X) ALIGNED_TO(X, SQLITE_DEFAULT_ALIGNMENT)
+# define SQLITE_MALLOC_ALIGNMENT SQLITE_DEFAULT_ALIGNMENT
 #endif
+#define EIGHT_BYTE_ALIGNMENT(X) ALIGNED_TO(X, SQLITE_MALLOC_ALIGNMENT)
 
 /*
 ** Disable MMAP on platforms where it is known to not work

@@ -4828,6 +4828,7 @@ int sqlite3PagerOpen(
   pPager->sjfd = (sqlite3_file*)pPtr;     pPtr += journalFileSize;
   pPager->jfd =  (sqlite3_file*)pPtr;     pPtr += journalFileSize;
   assert( EIGHT_BYTE_ALIGNMENT(pPager->jfd) );
+  pPtr = __builtin_assume_aligned(pPtr, SQLITE_MALLOC_ALIGNMENT);
   memcpy(pPtr, &pPager, sizeof(pPager));  pPtr += sizeof(pPager);
 
   /* Fill in the Pager.zFilename and pPager.zQueryParam fields */
