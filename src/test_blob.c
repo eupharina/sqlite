@@ -27,7 +27,7 @@ extern const char *sqlite3ErrName(int);
 
 /* From test1.c: */
 extern int getDbPointer(Tcl_Interp *interp, const char *zA, sqlite3 **ppDb);
-extern void *sqlite3TestTextToPtr(const char *z);
+extern int sqlite3TestTextToPtr(Tcl_Interp *interp, const char *z, void **p);
 
 /*
 ** Return a pointer to a buffer containing a text representation of the
@@ -77,7 +77,8 @@ static int blobHandleFromObj(
     instanceData = Tcl_GetChannelInstanceData(channel);
     *ppBlob = *((sqlite3_blob **)instanceData);
   }else{
-    *ppBlob = (sqlite3_blob*)sqlite3TestTextToPtr(z);
+    if( sqlite3TestTextToPtr(interp, z, (void**)ppBlob) )
+      return TCL_ERROR;
   }
 
   return TCL_OK;

@@ -654,7 +654,7 @@ static int SQLITE_TCLAPI tcl_thread_db_put(
 ){
   int i;
   extern int sqlite3TestMakePointerStr(Tcl_Interp*, char*, void*);
-  extern void *sqlite3TestTextToPtr(const char *);
+  extern int sqlite3TestTextToPtr(Tcl_Interp *interp, const char *z, void **p);
   if( argc!=3 ){
     Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
        " ID DB", 0);
@@ -668,7 +668,8 @@ static int SQLITE_TCLAPI tcl_thread_db_put(
   }
   test_thread_wait(&threadset[i]);
   assert( !threadset[i].db );
-  threadset[i].db = (sqlite3*)sqlite3TestTextToPtr(argv[2]);
+  if( sqlite3TestTextToPtr(interp, argv[2], (void**)&threadset[i].db) )
+    return TCL_ERROR;
   return TCL_OK;
 }
 

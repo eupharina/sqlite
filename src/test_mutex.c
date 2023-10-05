@@ -383,7 +383,8 @@ static sqlite3 *getDbPointer(Tcl_Interp *pInterp, Tcl_Obj *pObj){
   if( Tcl_GetCommandInfo(pInterp, zCmd, &info) ){
     db = *((sqlite3 **)info.objClientData);
   }else{
-    db = (sqlite3*)sqlite3TestTextToPtr(zCmd);
+    db = 0;
+    sqlite3TestTextToPtr(pInterp, zCmd, (void**)&db);
   }
   assert( db );
   return db;

@@ -68,7 +68,7 @@ int Sqlite3_Init(Tcl_Interp *);
 extern const char *sqlite3ErrName(int);
 
 /* Functions from test1.c */
-extern void *sqlite3TestTextToPtr(const char *);
+extern int sqlite3TestTextToPtr(Tcl_Interp *interp, const char *z, void **p);
 extern int getDbPointer(Tcl_Interp *, const char *, sqlite3 **);
 extern int sqlite3TestMakePointerStr(Tcl_Interp *, char *, void *);
 extern int sqlite3TestErrCode(Tcl_Interp *, sqlite3 *, int);
@@ -567,7 +567,8 @@ static int SQLITE_TCLAPI blocking_step_proc(
     return TCL_ERROR;
   }
 
-  pStmt = (sqlite3_stmt*)sqlite3TestTextToPtr(Tcl_GetString(objv[1]));
+  if( sqlite3TestTextToPtr(interp, Tcl_GetString(objv[1]), (void**)&pStmt) )
+    return TCL_ERROR;
   rc = sqlite3_blocking_step(pStmt);
 
   Tcl_SetResult(interp, (char *)sqlite3ErrName(rc), 0);

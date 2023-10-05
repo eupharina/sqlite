@@ -4632,7 +4632,10 @@ char *sqlite3VMPrintf(sqlite3*,const char*, va_list);
   void sqlite3DebugPrintf(const char*, ...);
 #endif
 #if defined(SQLITE_TEST)
-  void *sqlite3TestTextToPtr(const char*);
+  typedef struct Tcl_Interp Tcl_Interp;
+  int sqlite3TestTextToPtr(Tcl_Interp *interp, const char *z, void **p);
+  int sqlite3StorePtr(Tcl_Interp *interp, void *p, int *idx);
+  int sqlite3LoadPtr(Tcl_Interp *interp, int idx, void **p);
 #endif
 
 #if defined(SQLITE_DEBUG)
