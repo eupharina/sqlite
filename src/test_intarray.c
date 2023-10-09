@@ -287,7 +287,7 @@ SQLITE_API int sqlite3_intarray_bind(
 ** Routines to encode and decode pointers
 */
 extern int getDbPointer(Tcl_Interp *interp, const char *zA, sqlite3 **ppDb);
-extern void *sqlite3TestTextToPtr(const char*);
+extern int sqlite3TestTextToPtr(Tcl_Interp*, const char*, void**);
 extern int sqlite3TestMakePointerStr(Tcl_Interp*, char *zPtr, void*);
 extern const char *sqlite3ErrName(int);
 
@@ -347,7 +347,8 @@ static int SQLITE_TCLAPI test_intarray_bind(
     Tcl_WrongNumArgs(interp, 1, objv, "INTARRAY");
     return TCL_ERROR;
   }
-  pArray = (sqlite3_intarray*)sqlite3TestTextToPtr(Tcl_GetString(objv[1]));
+  if( sqlite3TestTextToPtr(interp, Tcl_GetString(objv[1]), (void**)&pArray) )
+    return TCL_ERROR;
   n = objc - 2;
 #ifndef SQLITE_OMIT_VIRTUALTABLE
   a = sqlite3_malloc64( sizeof(a[0])*n );
